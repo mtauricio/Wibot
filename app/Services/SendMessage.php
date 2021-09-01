@@ -9,20 +9,24 @@ class SendMessage
 {
 
 
-    public function sendMessage($request, $token)
+    public function sendMessages($request, $token)
     {
         $recipients = $request['recipients'];
         $responses = [];
+        Log::info($recipients);
         foreach ($recipients as $recipient) {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer '.$token
             ])->post(env('URL_API').'messages', [
                 "channelId" => $request['channelId'],
-                "recipient" => $recipient,
-                "content" => $request['content']
+                "recipient" => $recipient->mobile_number,
+                "content" => $recipient->message
             ]);
 
-            $responses[] = $response->json();
+            $responses['resWhatsapp'] = $response->json();
+            $responses['request'] = $request;
+            $delay = rand(3, 10);
+            sleep($delay);
         }
         return $responses;
     }

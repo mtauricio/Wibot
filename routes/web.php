@@ -20,3 +20,4 @@ Route::get('/', function () {
 Route::post('/webhook/endconversation', [\App\Http\Controllers\WebhookController::class, 'createEntriesCrm']);
 
 Route::post('/messages', [\App\Http\Controllers\MessagesController::class, 'sendMessages']);
+Route::post('/inbound', [\App\Http\Controllers\WebhookInboundController::class, 'WpInbound']);

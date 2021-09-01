@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SendMessages;
+use App\Jobs\SendBulkMessages;
 use App\Services\SendMessage;
 use App\Services\Token;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MessagesController extends Controller
 {
@@ -24,17 +25,25 @@ class MessagesController extends Controller
     }
     public function sendMessages(Request $request)
     {
+        Log::info($request->all());
+        Log::info("controllador");
+        // return json_encode($request->all());
         $request = $request->all(); 
+        $request['recipients'] = json_decode($request['recipients']);
         $token = $this->token->getToken();
        if ($request['allow_massive'] == false) {
-            $result = SendMessages::dispatch($request, $token);
+        $request['recipients'] = [$request['recipients']];
+        $result = $this->sendMessage->sendMessages($request, $token);
+            // $result = SendMessages::dispatch($request, $token);
        }else {
         $array = array_chunk($request['recipients'], 2);
         foreach ($array as $key) {
             $request['recipients'] = $key;
-            $result = SendMessages::dispatch($request, $token);
+            // $result = $this->sendMessage->sendMessages($request, $token);
+            $result = SendBulkMessages::dispatch($request, $token );
         }
        }
+    
     return $result;
     }
 }

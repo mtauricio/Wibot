@@ -9,9 +9,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class SendMessages implements ShouldQueue
+class SendBulkMessages implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -39,8 +40,14 @@ class SendMessages implements ShouldQueue
     public function handle(SendMessage $sendMessage)
     {
         $request = $this->request;
-        $response = $sendMessage->sendMessage($request, $this->token);
+        $response = $sendMessage->sendMessages($request, $this->token);
         Log::info(json_encode($response));
-        return $response;
+        Log::info("job");
+        $response = Http::asForm()->post('http://suitewsp.test/SuiteCRMWSP/index.php?entryPoint=DT_Whatsapp_Inbound', [
+            'resWhatsapp' => $response['resWhatsapp'],
+            'dataCall' => $response['request'],
+            'action' => 'create_call'
+        ]);
+        // return $response;
     }
 }
