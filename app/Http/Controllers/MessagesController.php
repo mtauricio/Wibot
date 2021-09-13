@@ -40,7 +40,7 @@ class MessagesController extends Controller
         foreach ($array as $key) {
             $request['recipients'] = $key;
             // $result = $this->sendMessage->sendMessages($request, $token);
-            $result = SendBulkMessages::dispatch($request, $token );
+            $result = SendBulkMessages::dispatch($request, $token )->delay(now()->addMinutes(2));
         }
        }
     
